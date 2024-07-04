@@ -24,11 +24,21 @@ int lucas_lehmer(int p) {
     mpz_mul_2exp(m, m, p); // m = 2^p
     mpz_sub_ui(m, m, 1); // m = 2^p - 1
 
+    time_t start_time, current_time;
+    time(&start_time);
+
     for (int i = 1; i < p - 1; i++) {
-        printf("Iteration %d/%d\n", i, p - 2); // Print current iteration
         mpz_mul(s, s, s); // s = s^2
         mpz_sub_ui(s, s, 2); // s = s - 2
         mersenne_mod(s, m, p); // Optimized modulus for Mersenne numbers
+
+        // Print progress every 30 seconds
+        time(&current_time);
+        if (difftime(current_time, start_time) >= 30) {
+            printf("\r%d/%d iterations completed", i, p - 2);
+            fflush(stdout);
+            time(&start_time); // Reset the timer
+        }
     }
 
     int result = mpz_cmp_ui(s, 0) == 0;
